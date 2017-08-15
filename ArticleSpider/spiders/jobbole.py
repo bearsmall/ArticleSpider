@@ -4,7 +4,7 @@ import scrapy
 import re
 from scrapy.http import Request
 from urllib import parse
-from ArticleSpider.items import JobBoleArticleItem
+from ArticleSpider.items import JobBoleArticleItem, ArticleItemLoader
 from ArticleSpider.utils.common import get_md5
 
 
@@ -75,6 +75,22 @@ class JobboleSpider(scrapy.Spider):
         article_item["comment_num"] = comment_num
         article_item["content"] = content
         article_item["tags"] = tags
+
+        # 通过ItemLoader加载Item
+        item_loader = ArticleItemLoader(item=JobBoleArticleItem(), response=response)
+        item_loader.add_value("url", response.url)
+        item_loader.add_value("url_object_id", get_md5(response.url))
+        item_loader.add_value("front_image_url", response.meta.get("front_image_url", ""))
+        item_loader.add_css("title", "div.entry-header h1::text")
+        item_loader.add_css("create_date", ".entry-meta-hide-on-mobile::text")
+        item_loader.add_css("praise_num", ".vote-post-up h10::text")
+        item_loader.add_css("fav_num", ".bookmark-btn::text")
+        item_loader.add_css("comment_num", "a[href='#article-comment'] span::text")
+        item_loader.add_css("content", "div.entry")
+        item_loader.add_css("tags", "p.entry-meta-hide-on-mobile a::text")
+
+        article_item = item_loader.load_item()
+
         yield article_item
 
     # xpath选择器
