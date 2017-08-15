@@ -10,7 +10,7 @@ try:
 except:
     import http.cookiejar as cookielib
 import re
-import pytesseract
+
 try:
     from PIL import Image
 except:
