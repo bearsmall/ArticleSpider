@@ -78,13 +78,14 @@ def login(account, password):
             "password": password,
         }
     else:
-        print("邮箱登录")
-        post_url = "https://www.zhihu.com/login/email"
-        post_data = {
-            "_xsrf": get_xsrf(),
-            "email": account,
-            "password": password,
-        }
+        if "@" in account:
+            print("邮箱登录")
+            post_url = "https://www.zhihu.com/login/email"
+            post_data = {
+                "_xsrf": get_xsrf(),
+                "email": account,
+                "password": password,
+            }
 
     # 不需要验证码登录
     response = session.post(post_url, data=post_data, headers=header)
